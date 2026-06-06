@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="L2DOC1 AI Tools Lab 公開展示首頁，保留首頁與 HW1 圖文小說播放功能。">
+  <title>L2DOC1 AI Tools Lab</title>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --ink: #17212c;
+      --muted: #5c6a78;
+      --paper: #f6fbff;
+      --surface: rgba(255, 255, 255, 0.84);
+      --line: rgba(23, 33, 44, 0.12);
+      --blue: #1976d2;
+      --green: #1b8a74;
+      --coral: #ef6c45;
+      --navy: #123a5f;
+      --shadow: 0 24px 70px rgba(24, 45, 72, 0.14);
+      --radius: 8px;
+      --font: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", system-ui, -apple-system, sans-serif;
+    }
+
+    :root[data-theme="dark"] {
+      --ink: #edf3f8;
+      --muted: #aebbc7;
+      --paper: #0d141c;
+      --surface: rgba(21, 31, 43, 0.9);
+      --line: rgba(223, 234, 244, 0.14);
+      --blue: #68a7ff;
+      --green: #4ed5bd;
+      --coral: #ff8c6b;
+      --navy: #08111b;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: var(--font);
+      line-height: 1.65;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px clamp(18px, 4vw, 56px);
+      background: rgba(246, 251, 255, 0.84);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(18px);
+    }
+
+    :root[data-theme="dark"] .site-header {
+      background: rgba(13, 20, 28, 0.84);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .brand-mark,
+    .module-icon,
+    .principle i {
+      display: grid;
+      place-items: center;
+      color: #fff;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--blue), var(--green));
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+    }
+
+    .main-nav,
+    .theme-switcher {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .main-nav a {
+      padding: 8px 10px;
+      color: var(--muted);
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .main-nav a:hover {
+      color: var(--ink);
+      background: var(--surface);
+    }
+
+    .theme-button {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--muted);
+      background: var(--surface);
+      cursor: pointer;
+    }
+
+    .theme-button.active {
+      color: #fff;
+      background: var(--navy);
+      border-color: transparent;
+    }
+
+    .hero {
+      min-height: 86vh;
+      display: grid;
+      align-items: center;
+      padding: clamp(48px, 8vw, 96px) clamp(18px, 4vw, 56px);
+      background:
+        linear-gradient(90deg, rgba(246, 251, 255, 0.96) 0%, rgba(246, 251, 255, 0.78) 48%, rgba(246, 251, 255, 0.22) 100%),
+        url("shinkai_bg.png") center / cover no-repeat;
+    }
+
+    :root[data-theme="dark"] .hero {
+      background:
+        linear-gradient(90deg, rgba(13, 20, 28, 0.98) 0%, rgba(13, 20, 28, 0.82) 48%, rgba(13, 20, 28, 0.46) 100%),
+        url("shinkai_bg.png") center / cover no-repeat;
+    }
+
+    .hero-inner,
+    .section-inner {
+      width: min(1160px, 100%);
+      margin: 0 auto;
+    }
+
+    .hero-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.82fr);
+      gap: clamp(28px, 5vw, 64px);
+      align-items: center;
+    }
+
+    .eyebrow,
+    .section-label {
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin-bottom: 18px;
+      font-size: clamp(42px, 7vw, 76px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin-bottom: 12px;
+      font-size: clamp(30px, 4vw, 48px);
+      line-height: 1.16;
+      letter-spacing: 0;
+    }
+
+    .hero-copy,
+    .section-head p,
+    .principle p,
+    .module-card p,
+    .stack-list {
+      color: var(--muted);
+    }
+
+    .hero-copy {
+      max-width: 700px;
+      font-size: 18px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 46px;
+      padding: 11px 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      color: #fff;
+      border-color: transparent;
+      background: var(--navy);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+    }
+
+    .hero-media {
+      overflow: hidden;
+      aspect-ratio: 16 / 10;
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.55);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-media video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .hero-kpis {
+      width: min(1160px, 100%);
+      margin: clamp(32px, 6vw, 72px) auto 0;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .kpi,
+    .principle,
+    .module-card,
+    .stack-item {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: 0 16px 40px rgba(24, 45, 72, 0.08);
+    }
+
+    .kpi {
+      padding: 18px;
+    }
+
+    .kpi strong {
+      display: block;
+      color: var(--blue);
+      font-size: 31px;
+      line-height: 1;
+    }
+
+    .kpi span {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .section {
+      padding: clamp(56px, 8vw, 96px) clamp(18px, 4vw, 56px);
+      background: #fff;
+    }
+
+    :root[data-theme="dark"] .section {
+      background: #111a24;
+    }
+
+    .section.work {
+      background: linear-gradient(180deg, #eef7ff 0%, #f8fbff 100%);
+    }
+
+    :root[data-theme="dark"] .section.work {
+      background: linear-gradient(180deg, #101d2a 0%, #0d141c 100%);
+    }
+
+    .section-head {
+      max-width: 780px;
+      margin-bottom: 28px;
+    }
+
+    .positioning-grid,
+    .module-grid,
+    .stack-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .principle,
+    .module-card,
+    .stack-item {
+      padding: 22px;
+    }
+
+    .principle i,
+    .module-icon {
+      width: 42px;
+      height: 42px;
+      margin-bottom: 18px;
+    }
+
+    .module-card {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .module-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .module-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .module-tag {
+      padding: 5px 8px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      background: rgba(255, 255, 255, 0.42);
+    }
+
+    .stack-list {
+      display: grid;
+      gap: 10px;
+      padding-left: 0;
+      list-style: none;
+    }
+
+    .stack-list li {
+      display: flex;
+      gap: 10px;
+    }
+
+    .stack-list i {
+      margin-top: 5px;
+      color: var(--green);
+    }
+
+    .cta {
+      color: #fff;
+      background: linear-gradient(135deg, var(--navy), #176c70);
+    }
+
+    .cta .section-head p {
+      color: rgba(255, 255, 255, 0.78);
+    }
+
+    .site-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 24px clamp(18px, 4vw, 56px);
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: var(--paper);
+      font-size: 14px;
+    }
+
+    @media (max-width: 920px) {
+      .site-header {
+        flex-wrap: wrap;
+      }
+
+      .main-nav {
+        order: 3;
+        width: 100%;
+        overflow-x: auto;
+      }
+
+      .hero-inner,
+      .positioning-grid,
+      .module-grid,
+      .stack-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-kpis {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero {
+        min-height: auto;
+      }
+
+      h1 {
+        font-size: 40px;
+      }
+
+      .hero-actions,
+      .site-footer {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="L2DOC1 首頁">
+      <span class="brand-mark"><i class="fa-solid fa-layer-group"></i></span>
+      <span>L2DOC1 AI Tools Lab</span>
+    </a>
+    <nav class="main-nav" aria-label="主選單">
+      <a href="#goal">目標</a>
+      <a href="#work">展示</a>
+      <a href="#package">公開版</a>
+      <a href="../HW1/indexHw1.html">HW1 播放</a>
+      <a href="https://github.com/gshan1209-cell/L2DOC1-github" target="_blank" rel="noreferrer">GitHub</a>
+    </nav>
+    <div class="theme-switcher" aria-label="主題切換">
+      <button class="theme-button" type="button" data-theme-option="light" title="淺色模式" aria-label="套用淺色模式">
+        <i class="fa-solid fa-sun"></i>
+      </button>
+      <button class="theme-button" type="button" data-theme-option="dark" title="深色模式" aria-label="套用深色模式">
+        <i class="fa-solid fa-moon"></i>
+      </button>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-inner">
+        <div>
+          <span class="eyebrow"><i class="fa-solid fa-circle-nodes"></i> Public Static Showcase</span>
+          <h1 id="hero-title">AI 工具整合實作的公開展示首頁</h1>
+          <p class="hero-copy">
+            這個公開版保留首頁展示與 HW1 圖文小說播放功能，移除後端程式、其他作業原始碼、開發文件與敏感設定，適合部署到 GitHub Pages。
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="../HW1/indexHw1.html"><i class="fa-solid fa-play"></i> 播放 HW1</a>
+            <a class="btn btn-secondary" href="#package"><i class="fa-solid fa-shield-halved"></i> 查看保留範圍</a>
+          </div>
+        </div>
+        <div class="hero-media" aria-label="首頁展示影片">
+          <video src="../uploads/929ca1fb907446cb858d0cd639c9db68.mp4" autoplay muted loop playsinline></video>
+        </div>
+      </div>
+      <div class="hero-kpis" aria-label="公開版重點">
+        <div class="kpi">
+          <strong>Static</strong>
+          <span>純靜態首頁，無後端 API 依賴</span>
+        </div>
+        <div class="kpi">
+          <strong>HW1</strong>
+          <span>保留圖文小說播放功能</span>
+        </div>
+        <div class="kpi">
+          <strong>Pages</strong>
+          <span>可直接部署到 GitHub Pages</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="goal">
+      <div class="section-inner">
+        <div class="section-head">
+          <span class="section-label">Project Goal</span>
+          <h2>保留展示價值，控制公開範圍</h2>
+          <p>公開頁保留專案定位、能力方向、未來整合概念與 HW1 播放入口，讓訪客理解 L2DOC1 的展示目的，同時避免公開後端、提示詞與其他作業程式。</p>
+        </div>
+        <div class="positioning-grid">
+          <article class="principle">
+            <i class="fa-solid fa-eye"></i>
+            <h3>展示優先</h3>
+            <p>保留首頁視覺、導覽、主題切換與成果摘要，讓公開頁面仍能完整瀏覽。</p>
+          </article>
+          <article class="principle">
+            <i class="fa-solid fa-play"></i>
+            <h3>HW1 播放</h3>
+            <p>只保留播放預設故事所需的靜態播放器與素材，不包含原本的編輯器與 API 功能。</p>
+          </article>
+          <article class="principle">
+            <i class="fa-solid fa-lock"></i>
+            <h3>內容控管</h3>
+            <p>移除後端、其他作業模組、開發紀錄與未使用素材，降低外流風險。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section work" id="work">
+      <div class="section-inner">
+        <div class="section-head">
+          <span class="section-label">Public Modules</span>
+          <h2>公開版保留的展示內容</h2>
+          <p>以下內容皆為靜態展示，其中 HW1 只保留播放器，不呼叫任何後端服務。</p>
+        </div>
+        <div class="module-grid">
+          <a class="module-card" href="../HW1/indexHw1.html">
+            <span class="module-icon"><i class="fa-solid fa-play"></i></span>
+            <h3>HW1 圖文小說播放器</h3>
+            <p>播放「小王子與銀色之花」預設故事，支援片頭影片、字幕、自動播放與上一幕/下一幕控制。</p>
+            <span class="module-tags">
+              <span class="module-tag">Player</span>
+              <span class="module-tag">Static</span>
+            </span>
+          </a>
+          <article class="module-card">
+            <span class="module-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+            <h3>AI 工具整合</h3>
+            <p>整理生成式 AI、資料分析、語音互動與內容產製等應用方向。</p>
+            <span class="module-tags">
+              <span class="module-tag">AI Tools</span>
+              <span class="module-tag">Planning</span>
+            </span>
+          </article>
+          <article class="module-card">
+            <span class="module-icon"><i class="fa-solid fa-layer-group"></i></span>
+            <h3>未來服務入口</h3>
+            <p>保留未來可整合為智能客服、內容生成與資料服務入口的方向。</p>
+            <span class="module-tags">
+              <span class="module-tag">Portal</span>
+              <span class="module-tag">Integration</span>
+            </span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="package">
+      <div class="section-inner">
+        <div class="section-head">
+          <span class="section-label">Public Package</span>
+          <h2>公開版只留下首頁與 HW1 播放必要檔案</h2>
+          <p>這個 repository 現在是可公開瀏覽的靜態頁版本，不包含後端與其他作業程式碼。</p>
+        </div>
+        <div class="stack-grid">
+          <article class="stack-item">
+            <h3>保留</h3>
+            <ul class="stack-list">
+              <li><i class="fa-solid fa-check"></i><span>根目錄導頁與 `static/index.html`</span></li>
+              <li><i class="fa-solid fa-check"></i><span>HW1 靜態播放器與預設故事資料</span></li>
+              <li><i class="fa-solid fa-check"></i><span>首頁背景圖、展示影片與 HW1 故事圖片</span></li>
+            </ul>
+          </article>
+          <article class="stack-item">
+            <h3>移除</h3>
+            <ul class="stack-list">
+              <li><i class="fa-solid fa-check"></i><span>FastAPI / Python 後端程式</span></li>
+              <li><i class="fa-solid fa-check"></i><span>其他作業資料夾與編輯器程式</span></li>
+              <li><i class="fa-solid fa-check"></i><span>提示詞、架構文件與未使用素材</span></li>
+            </ul>
+          </article>
+          <article class="stack-item">
+            <h3>運作方式</h3>
+            <ul class="stack-list">
+              <li><i class="fa-solid fa-check"></i><span>首頁不呼叫後端服務或資料介面</span></li>
+              <li><i class="fa-solid fa-check"></i><span>HW1 直接讀取靜態 JSON 與媒體素材</span></li>
+              <li><i class="fa-solid fa-check"></i><span>適合直接部署到 GitHub Pages</span></li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section cta" id="future">
+      <div class="section-inner">
+        <div class="section-head">
+          <span class="section-label">Next Step</span>
+          <h2>公開展示與私有開發分離</h2>
+          <p>後續若還要繼續開發完整功能，建議把私有原始碼放在 private repository，公開 repository 只同步靜態展示頁與可公開播放內容。</p>
+        </div>
+        <a class="btn btn-secondary" href="#top"><i class="fa-solid fa-arrow-up"></i> 回到首頁</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>2026 L2DOC1 AI Tools Lab</span>
+    <span>Public static showcase with HW1 player</span>
+  </footer>
+
+  <script>
+    const THEME_STORAGE_KEY = "l2doc1-theme";
+    const supportedThemes = ["light", "dark"];
+
+    function applyTheme(theme) {
+      const nextTheme = supportedThemes.includes(theme) ? theme : "light";
+      document.documentElement.dataset.theme = nextTheme;
+      localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+      document.querySelectorAll("[data-theme-option]").forEach((button) => {
+        const active = button.dataset.themeOption === nextTheme;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-pressed", String(active));
+      });
+    }
+
+    document.querySelectorAll("[data-theme-option]").forEach((button) => {
+      button.addEventListener("click", () => applyTheme(button.dataset.themeOption));
+    });
+
+    applyTheme(localStorage.getItem(THEME_STORAGE_KEY));
+  </script>
+</body>
+</html>

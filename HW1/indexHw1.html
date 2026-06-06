@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HW1 圖文小說播放器 | L2DOC1</title>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --ink: #f8fafc;
+      --muted: #b9c6d8;
+      --panel: #0b1220;
+      --panel-soft: rgba(15, 23, 42, 0.9);
+      --line: rgba(255, 255, 255, 0.14);
+      --accent: #7dd3fc;
+      --accent-2: #fda4af;
+      --radius: 8px;
+      --caption-height: clamp(180px, 28vh, 270px);
+      --frame-size: min(calc(100vw - 72px), calc(100vh - var(--caption-height) - 112px));
+      --font: "Noto Sans TC", "Microsoft JhengHei", system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow: hidden;
+      color: var(--ink);
+      background: #050816;
+      font-family: var(--font);
+    }
+
+    .player {
+      width: 100vw;
+      height: 100vh;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) var(--caption-height);
+      background: #050816;
+    }
+
+    .stage {
+      position: relative;
+      min-height: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(54, 75, 112, 0.22), transparent 42%),
+        #020617;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: clamp(58px, 8vh, 86px) clamp(18px, 4vw, 42px) clamp(18px, 4vh, 36px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 650ms ease, transform 650ms ease;
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0) scale(1);
+    }
+
+    .slide.enter-right {
+      transform: translateX(22px);
+    }
+
+    .slide.zoom {
+      transform: scale(1.035);
+    }
+
+    .frame {
+      width: var(--frame-size);
+      height: var(--frame-size);
+      max-width: 100%;
+      max-height: 100%;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius);
+      background: #000;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.34);
+      overflow: hidden;
+    }
+
+    .media {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      background: #000;
+    }
+
+    .topbar {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      pointer-events: none;
+    }
+
+    .topbar > * {
+      pointer-events: auto;
+    }
+
+    .brand,
+    .controls,
+    .caption-panel,
+    .start-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(11, 18, 32, 0.76);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.32);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 42px;
+      padding: 9px 12px;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px;
+    }
+
+    button,
+    .home-link {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      color: var(--ink);
+      background: transparent;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    button:hover,
+    .home-link:hover {
+      border-color: var(--line);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .counter {
+      min-width: 68px;
+      padding: 0 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 20;
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .progress span {
+      display: block;
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width 160ms linear;
+    }
+
+    .caption-panel {
+      position: relative;
+      z-index: 5;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: 10px;
+      margin: 0;
+      padding: clamp(16px, 3vw, 26px) clamp(18px, 5vw, 56px);
+      border-right: 0;
+      border-bottom: 0;
+      border-left: 0;
+      border-radius: 0;
+      background:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(8, 13, 23, 0.98));
+    }
+
+    .caption-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .caption-text {
+      max-width: 1050px;
+      margin: 0 auto;
+      color: var(--ink);
+      font-size: clamp(17px, 2.15vw, 24px);
+      font-weight: 650;
+      line-height: 1.72;
+      letter-spacing: 0;
+      white-space: pre-wrap;
+      overflow-y: auto;
+      text-align: center;
+    }
+
+    .type-cursor::after {
+      content: "";
+      display: inline-block;
+      width: 0.58em;
+      height: 1.05em;
+      margin-left: 0.08em;
+      transform: translateY(0.16em);
+      border-right: 2px solid var(--accent);
+      animation: blink 900ms steps(1) infinite;
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
+
+    .start-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: radial-gradient(circle at center, rgba(20, 43, 72, 0.44), rgba(5, 8, 22, 0.92));
+    }
+
+    .start-layer.hidden {
+      display: none;
+    }
+
+    .start-card {
+      width: min(520px, 100%);
+      padding: 26px;
+      text-align: center;
+    }
+
+    .start-card h1 {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 5vw, 42px);
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    .start-card p {
+      margin: 0 0 20px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .start-button {
+      width: auto;
+      min-width: 170px;
+      height: 46px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 0 18px;
+      color: #05111f;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      font-weight: 900;
+    }
+
+    @media (max-width: 720px) {
+      :root {
+        --caption-height: 220px;
+        --frame-size: min(calc(100vw - 28px), calc(100vh - var(--caption-height) - 88px));
+      }
+
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .brand span {
+        display: none;
+      }
+
+      .slide {
+        padding: 62px 14px 14px;
+      }
+
+      .caption-panel {
+        padding: 16px;
+      }
+
+      .caption-text {
+        font-size: 17px;
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+
+  <main class="player">
+    <section class="stage" id="stage" aria-label="故事圖片舞台">
+      <div id="slides"></div>
+    </section>
+
+    <aside class="caption-panel" aria-live="polite">
+      <div class="caption-heading">
+        <span id="story-title">HW1 圖文小說</span>
+        <span id="caption-status">Typewriter</span>
+      </div>
+      <p class="caption-text type-cursor" id="caption-text">載入中...</p>
+    </aside>
+  </main>
+
+  <header class="topbar">
+    <a class="brand" href="../static/index.html" aria-label="回到首頁">
+      <i class="fa-solid fa-house"></i>
+      <span>L2DOC1 / HW1 Player</span>
+    </a>
+    <div class="controls" aria-label="播放控制">
+      <button type="button" id="prev" title="上一幕" aria-label="上一幕"><i class="fa-solid fa-chevron-left"></i></button>
+      <button type="button" id="toggle" title="播放 / 暫停" aria-label="播放或暫停"><i class="fa-solid fa-pause"></i></button>
+      <button type="button" id="next" title="下一幕" aria-label="下一幕"><i class="fa-solid fa-chevron-right"></i></button>
+      <span class="counter" id="counter">0 / 0</span>
+      <a class="home-link" href="../static/index.html" title="回首頁" aria-label="回首頁"><i class="fa-solid fa-xmark"></i></a>
+    </div>
+  </header>
+
+  <div class="start-layer" id="start-layer">
+    <div class="start-card">
+      <h1>小王子與銀色之花</h1>
+      <p>圖片會完整呈現於上方舞台，文字在下方字幕區逐字顯示，不會覆蓋故事畫面。</p>
+      <button class="start-button" type="button" id="start">
+        <i class="fa-solid fa-play"></i>
+        開始播放
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const TYPE_SPEED_MS = 42;
+    const MIN_HOLD_AFTER_TYPING_MS = 1200;
+
+    const state = {
+      novel: null,
+      index: 0,
+      playing: true,
+      started: false,
+      slideTimer: null,
+      progressTimer: null,
+      typeTimer: null,
+      typeText: "",
+      typeIndex: 0,
+      progressStart: 0,
+      progressDuration: 0
+    };
+
+    const els = {
+      slides: document.getElementById("slides"),
+      caption: document.getElementById("caption-text"),
+      title: document.getElementById("story-title"),
+      status: document.getElementById("caption-status"),
+      counter: document.getElementById("counter"),
+      progress: document.getElementById("progress-bar"),
+      startLayer: document.getElementById("start-layer"),
+      toggle: document.getElementById("toggle")
+    };
+
+    function resolveMediaUrl(url) {
+      return (url || "").replace(/\\/g, "/");
+    }
+
+    function createFallbackNovel() {
+      return {
+        title: "小王子與銀色之花",
+        slides: Array.from({ length: 12 }, (_, index) => {
+          const number = index + 1;
+          return {
+            id: `fallback_${number}`,
+            type: "image",
+            url: `../uploads/story${number}.png`,
+            text: `第 ${number} 幕\n小王子與銀色之花的旅程正在展開。`,
+            duration: 12,
+            transition: number % 3 === 0 ? "slide-in" : number % 5 === 0 ? "zoom-in" : "fade"
+          };
+        })
+      };
+    }
+
+    async function loadNovel() {
+      const response = await fetch("default_novel.json", { cache: "no-store" });
+      if (!response.ok) throw new Error("Cannot load default_novel.json");
+      state.novel = await response.json();
+      setupNovel();
+      setTimeout(startPlayback, 700);
+    }
+
+    function setupNovel() {
+      els.title.textContent = state.novel.title || "HW1 圖文小說";
+      renderSlides();
+      showSlide(0, false);
+    }
+
+    function renderSlides() {
+      els.slides.innerHTML = state.novel.slides.map((slide, index) => {
+        const transition = slide.transition === "slide-in" ? "enter-right" : slide.transition === "zoom-in" ? "zoom" : "";
+        const media = slide.type === "video"
+          ? `<video class="media" src="${resolveMediaUrl(slide.url)}" muted loop playsinline></video>`
+          : `<img class="media" src="${resolveMediaUrl(slide.url)}" alt="">`;
+        return `<section class="slide ${transition}" data-index="${index}"><div class="frame">${media}</div></section>`;
+      }).join("");
+    }
+
+    function clearPlaybackTimers() {
+      clearTimeout(state.slideTimer);
+      clearInterval(state.progressTimer);
+      clearTimeout(state.typeTimer);
+      state.slideTimer = null;
+      state.progressTimer = null;
+      state.typeTimer = null;
+    }
+
+    function updateProgressBar() {
+      if (!state.playing || !state.progressDuration) return;
+      const elapsed = Date.now() - state.progressStart;
+      els.progress.style.width = `${Math.min(100, (elapsed / state.progressDuration) * 100)}%`;
+    }
+
+    function startProgress(durationMs) {
+      clearInterval(state.progressTimer);
+      state.progressStart = Date.now();
+      state.progressDuration = durationMs;
+      els.progress.style.width = "0%";
+      state.progressTimer = setInterval(updateProgressBar, 100);
+    }
+
+    function typeCaption(text, onComplete) {
+      clearTimeout(state.typeTimer);
+      state.typeText = text || "";
+      state.typeIndex = 0;
+      els.caption.textContent = "";
+      els.caption.classList.add("type-cursor");
+      els.status.textContent = "Typing";
+
+      function tick() {
+        if (!state.playing) {
+          state.typeTimer = setTimeout(tick, 120);
+          return;
+        }
+
+        state.typeIndex += 1;
+        els.caption.textContent = state.typeText.slice(0, state.typeIndex);
+
+        if (state.typeIndex < state.typeText.length) {
+          state.typeTimer = setTimeout(tick, TYPE_SPEED_MS);
+        } else {
+          els.caption.classList.remove("type-cursor");
+          els.status.textContent = "Auto Play";
+          onComplete();
+        }
+      }
+
+      tick();
+    }
+
+    function showSlide(nextIndex, autoAdvance = true) {
+      if (!state.novel?.slides?.length) return;
+      clearPlaybackTimers();
+
+      const total = state.novel.slides.length;
+      state.index = (nextIndex + total) % total;
+      const slide = state.novel.slides[state.index];
+
+      document.querySelectorAll(".slide").forEach((node) => {
+        const isActive = Number(node.dataset.index) === state.index;
+        node.classList.toggle("active", isActive);
+        const video = node.querySelector("video");
+        if (video) {
+          if (isActive && state.playing) video.play().catch(() => {});
+          else video.pause();
+        }
+      });
+
+      els.counter.textContent = `${state.index + 1} / ${total}`;
+      const baseDurationMs = Math.max(1, Number(slide.duration || 8)) * 1000;
+
+      typeCaption(slide.text || "", () => {
+        const holdMs = Math.max(MIN_HOLD_AFTER_TYPING_MS, baseDurationMs);
+        startProgress(holdMs);
+        if (autoAdvance) {
+          state.slideTimer = setTimeout(() => showSlide(state.index + 1), holdMs);
+        }
+      });
+    }
+
+    function startPlayback() {
+      if (state.started) return;
+      state.started = true;
+      state.playing = true;
+      els.startLayer.classList.add("hidden");
+      els.toggle.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+      showSlide(0);
+    }
+
+    function togglePlayback() {
+      state.playing = !state.playing;
+      els.toggle.innerHTML = state.playing
+        ? `<i class="fa-solid fa-pause"></i>`
+        : `<i class="fa-solid fa-play"></i>`;
+
+      const activeVideo = document.querySelector(".slide.active video");
+      if (activeVideo) {
+        if (state.playing) activeVideo.play().catch(() => {});
+        else activeVideo.pause();
+      }
+    }
+
+    function goToSlide(index) {
+      state.started = true;
+      state.playing = true;
+      els.startLayer.classList.add("hidden");
+      els.toggle.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+      showSlide(index);
+    }
+
+    document.getElementById("start").addEventListener("click", startPlayback);
+    document.getElementById("prev").addEventListener("click", () => goToSlide(state.index - 1));
+    document.getElementById("next").addEventListener("click", () => goToSlide(state.index + 1));
+    els.toggle.addEventListener("click", togglePlayback);
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") goToSlide(state.index - 1);
+      if (event.key === "ArrowRight") goToSlide(state.index + 1);
+      if (event.key === " ") {
+        event.preventDefault();
+        togglePlayback();
+      }
+      if (event.key === "Escape") window.location.href = "../static/index.html";
+    });
+
+    loadNovel().catch((error) => {
+      console.error(error);
+      state.novel = createFallbackNovel();
+      setupNovel();
+      els.caption.textContent = "已載入備援故事資料，按下開始即可播放。";
+      setTimeout(startPlayback, 700);
+    });
+  </script>
+</body>
+</html>
