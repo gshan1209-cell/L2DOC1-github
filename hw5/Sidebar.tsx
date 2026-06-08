@@ -22,7 +22,7 @@ export default function Sidebar() {
 
     useEffect(() => {
         // 1. 從後端取得演算法列表
-        fetch(process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/algorithms')
+        fetch('/api/algorithms')
             .then(res => res.json())
             .then(data => setAlgorithms(data))
             .catch(err => console.error("Fetch algorithms error:", err));

@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ML Algorithm Tutor</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d8dee9;
+      --panel: #ffffff;
+      --bg: #f7f8fb;
+      --blue: #2563eb;
+      --green: #0f9f6e;
+      --red: #dc2626;
+      --amber: #b7791f;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, "Microsoft JhengHei", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    header {
+      background: #101828;
+      color: #fff;
+      padding: 28px 24px;
+      border-bottom: 4px solid var(--blue);
+    }
+
+    .top {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: end;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 720px;
+      color: #d0d5dd;
+      line-height: 1.6;
+    }
+
+    .api-link {
+      color: #fff;
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, .35);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 22px 24px 48px;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) 210px 160px;
+      gap: 12px;
+      margin: 8px 0 20px;
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      min-height: 42px;
+      padding: 0 12px;
+      font: inherit;
+      color: var(--ink);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+
+    .stat b {
+      display: block;
+      font-size: 26px;
+      margin-bottom: 3px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      min-height: 190px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 10px;
+      cursor: pointer;
+      transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+    }
+
+    .card:hover {
+      border-color: var(--blue);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px rgba(16, 24, 40, .08);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .num {
+      color: #98a2b3;
+      font-weight: 900;
+      font-size: 22px;
+    }
+
+    .badge {
+      border-radius: 999px;
+      padding: 5px 9px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 19px;
+      line-height: 1.25;
+    }
+
+    .category {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .summary {
+      color: #475467;
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .open {
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    dialog {
+      border: 0;
+      width: min(720px, calc(100vw - 28px));
+      border-radius: 8px;
+      padding: 0;
+      box-shadow: 0 24px 60px rgba(16, 24, 40, .28);
+    }
+
+    dialog::backdrop { background: rgba(16, 24, 40, .55); }
+
+    .modal-head {
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .modal-head h2 {
+      margin: 0 0 4px;
+      font-size: 24px;
+    }
+
+    .modal-body {
+      padding: 20px 22px 24px;
+      max-height: 70vh;
+      overflow: auto;
+    }
+
+    .close {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .section-title {
+      margin: 18px 0 8px;
+      font-size: 14px;
+      color: #344054;
+      text-transform: uppercase;
+    }
+
+    ul {
+      margin: 8px 0 0;
+      padding-left: 20px;
+      color: #475467;
+      line-height: 1.65;
+    }
+
+    .empty {
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      padding: 28px;
+      text-align: center;
+      color: var(--muted);
+      background: #fff;
+    }
+
+    @media (max-width: 760px) {
+      .top, .toolbar, .stats {
+        grid-template-columns: 1fr;
+      }
+
+      header, main {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="top">
+      <div>
+        <h1>ML Algorithm Tutor</h1>
+        <p class="subtitle">A focused learning dashboard for ten core machine-learning algorithms. Search, filter, and open each algorithm for quick study notes.</p>
+      </div>
+      <a class="api-link" href="/docs">API Docs</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="stats" aria-label="summary">
+      <div class="stat"><b id="count">0</b><span>Algorithms</span></div>
+      <div class="stat"><b id="category-count">0</b><span>Categories</span></div>
+      <div class="stat"><b id="visible-count">0</b><span>Visible cards</span></div>
+    </section>
+
+    <section class="toolbar" aria-label="filters">
+      <input id="search" type="search" placeholder="Search algorithm name, category, or summary" />
+      <select id="category">
+        <option value="">All categories</option>
+      </select>
+      <select id="difficulty">
+        <option value="">All levels</option>
+      </select>
+    </section>
+
+    <section id="grid" class="grid" aria-live="polite"></section>
+    <p id="empty" class="empty" hidden>No matching algorithms.</p>
+  </main>
+
+  <dialog id="detail">
+    <div class="modal-head">
+      <div>
+        <h2 id="detail-title"></h2>
+        <div id="detail-meta" class="category"></div>
+      </div>
+      <button class="close" id="close" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p id="detail-summary" class="summary"></p>
+      <h3 class="section-title">How It Works</h3>
+      <ul id="detail-works"></ul>
+      <h3 class="section-title">Use Cases</h3>
+      <ul id="detail-uses"></ul>
+      <h3 class="section-title">Pros</h3>
+      <ul id="detail-pros"></ul>
+      <h3 class="section-title">Cons</h3>
+      <ul id="detail-cons"></ul>
+    </div>
+  </dialog>
+
+  <script>
+    const state = { algorithms: [], search: "", category: "", difficulty: "" };
+    const grid = document.getElementById("grid");
+    const empty = document.getElementById("empty");
+
+    const fallbackSummary = {
+      "linear-regression": "Predicts a continuous value by fitting a straight-line relationship between inputs and output.",
+      "logistic-regression": "Estimates the probability of a class, often used for binary classification.",
+      "decision-tree": "Splits data with simple rules to make predictions that are easy to explain.",
+      "random-forest": "Combines many decision trees to improve accuracy and reduce overfitting.",
+      "support-vector-machine": "Finds a strong separating boundary between classes.",
+      "knn": "Classifies a sample by looking at the closest examples in the training data.",
+      "k-means": "Groups similar data points into clusters without labels.",
+      "naive-bayes": "Uses probability rules with a simplifying independence assumption.",
+      "neural-network": "Learns layered representations for complex patterns.",
+      "pca": "Reduces dimensions while keeping the most important variation in the data."
+    };
+
+    function clean(value, fallback = "Not specified") {
+      if (!value || typeof value !== "string") return fallback;
+      const broken = (value.match(/[?�]/g) || []).length;
+      return broken > Math.max(2, value.length / 8) ? fallback : value;
+    }
+
+    function list(items) {
+      return Array.isArray(items) ? items.map(item => clean(item, "Study note unavailable")) : [];
+    }
+
+    function renderOptions() {
+      const categories = [...new Set(state.algorithms.map(a => clean(a.category)).filter(Boolean))];
+      const difficulties = [...new Set(state.algorithms.map(a => clean(a.difficulty)).filter(Boolean))];
+      document.getElementById("category").innerHTML = `<option value="">All categories</option>` + categories.map(v => `<option>${v}</option>`).join("");
+      document.getElementById("difficulty").innerHTML = `<option value="">All levels</option>` + difficulties.map(v => `<option>${v}</option>`).join("");
+      document.getElementById("count").textContent = state.algorithms.length;
+      document.getElementById("category-count").textContent = categories.length;
+    }
+
+    function filtered() {
+      const q = state.search.toLowerCase();
+      return state.algorithms.filter(a => {
+        const name = `${a.name_en || ""} ${clean(a.name_zh, "")} ${clean(a.category, "")} ${fallbackSummary[a.slug] || clean(a.one_liner, "")}`.toLowerCase();
+        return (!q || name.includes(q))
+          && (!state.category || clean(a.category) === state.category)
+          && (!state.difficulty || clean(a.difficulty) === state.difficulty);
+      });
+    }
+
+    function render() {
+      const rows = filtered();
+      document.getElementById("visible-count").textContent = rows.length;
+      empty.hidden = rows.length !== 0;
+      grid.innerHTML = rows.map((a, index) => `
+        <article class="card" data-slug="${a.slug}" tabindex="0">
+          <div class="card-top">
+            <span class="num">${String(index + 1).padStart(2, "0")}</span>
+            <span class="badge">${clean(a.difficulty, "Core")}</span>
+          </div>
+          <div>
+            <div class="category">${clean(a.category, "Machine Learning")}</div>
+            <h2>${a.name_en || clean(a.name_zh, "Algorithm")}</h2>
+          </div>
+          <p class="summary">${fallbackSummary[a.slug] || clean(a.one_liner, "Open this card to review the algorithm notes.")}</p>
+          <span class="open">Open notes</span>
+        </article>
+      `).join("");
+    }
+
+    function fillList(id, values) {
+      const target = document.getElementById(id);
+      const safeValues = values.length ? values : ["Study note unavailable"];
+      target.innerHTML = safeValues.map(v => `<li>${v}</li>`).join("");
+    }
+
+    function openDetail(slug) {
+      const item = state.algorithms.find(a => a.slug === slug);
+      if (!item) return;
+      document.getElementById("detail-title").textContent = item.name_en || clean(item.name_zh, "Algorithm");
+      document.getElementById("detail-meta").textContent = `${clean(item.category, "Machine Learning")} · ${clean(item.difficulty, "Core")}`;
+      document.getElementById("detail-summary").textContent = fallbackSummary[item.slug] || clean(item.description, clean(item.one_liner, "Study note unavailable"));
+      fillList("detail-works", list(item.how_it_works));
+      fillList("detail-uses", list(item.use_cases));
+      fillList("detail-pros", list(item.pros));
+      fillList("detail-cons", list(item.cons));
+      document.getElementById("detail").showModal();
+    }
+
+    document.getElementById("search").addEventListener("input", event => {
+      state.search = event.target.value;
+      render();
+    });
+
+    document.getElementById("category").addEventListener("change", event => {
+      state.category = event.target.value;
+      render();
+    });
+
+    document.getElementById("difficulty").addEventListener("change", event => {
+      state.difficulty = event.target.value;
+      render();
+    });
+
+    grid.addEventListener("click", event => {
+      const card = event.target.closest(".card");
+      if (card) openDetail(card.dataset.slug);
+    });
+
+    grid.addEventListener("keydown", event => {
+      if (event.key !== "Enter") return;
+      const card = event.target.closest(".card");
+      if (card) openDetail(card.dataset.slug);
+    });
+
+    document.getElementById("close").addEventListener("click", () => document.getElementById("detail").close());
+
+    fetch("/api/algorithms/")
+      .then(response => response.json())
+      .then(data => {
+        state.algorithms = data;
+        renderOptions();
+        render();
+      })
+      .catch(() => {
+        empty.hidden = false;
+        empty.textContent = "Could not load algorithm data.";
+      });
+  </script>
+</body>
+</html>

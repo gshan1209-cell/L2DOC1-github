@@ -4,33 +4,19 @@
 
 ## 1. 專案總覽
 - **專案名稱**：機器學習前十大演算法互動學習網站 (ML Algorithm Tutor)
-- **前端技術**：Next.js (App Router), TypeScript, Tailwind CSS, React
-- **後端技術**：FastAPI, Python
+- **技術架構**：Next.js (App Router), TypeScript, Tailwind CSS, React
 - **核心目標**：建立新手友善的機器學習演算法互動教學網站，包含 10 大演算法圖解、測驗與 AI 助理 (Live2D/Fallback)。
 
 ## 2. 目前開發進度 (Current Phase)
-**目前狀態：Phase 1 專案骨架與核心資料建立**
+**目前狀態：功能趨近完成，待整合與優化**
 
 ✅ **已完成 (Done)**:
-1. 建立 `DEVELOPMENT_RECORD.md` (開發交接紀錄)。
-2. 建立 `README.md` (包含專案介紹與啟動說明)。
-3. 建立後端基礎結構 (`backend/main.py`, `backend/requirements.txt`)。
-4. 建立後端 API 路由 (`backend/app/api/algorithms.py`)。
-5. 建立核心演算法靜態資料 (`backend/app/data/algorithms.json`)，目前已寫入「線性回歸」與「邏輯回歸」的範例格式，需補齊另外 8 個。
-6. 前端基礎架構建立：初始化 Next.js 首頁 (`frontend/app/page.tsx`)，實作 Hero 區塊。
-7. 建立前端 `AlgorithmCard` 與 `AlgorithmGrid` 元件，並串接後端 API 顯示演算法列表。
-8. 實作左側導覽列 `Sidebar` 與全局 `layout.tsx`，動態列出十大演算法並支援讀取 localStorage 顯示學習狀態。
-9. 完成前端演算法詳細頁 (`algorithms/[slug]/page.tsx`)、學習完成進度按鈕以及初步的 `AlgorithmVisualizer` 圖解元件。
-10. 完成 `algorithms.json` 剩下 8 個演算法靜態資料擴充，首頁與導覽列可呈現完整十大演算法。
-11. 完成 AI 助理介面 `ChatAssistant.tsx` 與虛擬助教卡片 `Live2DFallbackAvatar.tsx`，並在後端對接 `/api/chat` Mock 路由。
-12. 實作前端 `QuizBlock` 小測驗元件，並整合至詳細頁下方，同時與 `localStorage` 學習進度連動。
-13. 將 FastAPI 的 `/api/chat` 路由改寫，串接 OpenAI API 提供真實的 AI 機器學習問答功能。
-14. 擴充 `algorithms.json` 的 `quiz` 陣列，10 個演算法皆具備至少 3 題的互動測驗。
-15. 補齊 `AlgorithmVisualizer.tsx` 的所有演算法 CSS 視覺圖解，讓 10 個主題都有生動的動畫示意。
-16. 引入 `framer-motion`，為演算法卡片 (`AlgorithmCard.tsx`) 加上錯開的淡入滑動特效。
-17. 建立 `SearchBox.tsx` 搜尋功能，並整合至 `AlgorithmGrid` (首頁) 與 `Sidebar` (導覽列)。
-18. 實作綜合進度條 (`ProgressBar.tsx`) 並顯示於 `Sidebar` 最下方。
-19. 實作「我的收藏」(favorites) 功能，建立 `FavoriteButton.tsx`，整合至詳細頁與卡片，並連動 `localStorage` 與 `Sidebar` 愛心標記。
+1. **專案架構重構**：將專案從前後端分離重構為純 Next.js 應用，移除獨立的 Python 後端，並將所有 API 邏輯移轉至 Next.js API Routes。
+2. **核心內容與 API**：完成十大演算法的靜態資料 (`data/algorithms.json`) 與對應的 API (`/api/algorithms`)。
+3. **前端核心頁面**：完成首頁、演算法詳細頁、關於我們頁面。
+4. **核心元件**：完成演算法卡片、左側導覽列、搜尋框、進度條、視覺圖解等元件。
+5. **互動功能**：完成小測驗 (`QuizBlock`)、收藏 (`FavoriteButton`)、學習進度標記功能，並與 `localStorage` 連動。
+6. **AI 助理**：完成 AI 助理聊天介面 (`ChatAssistant`)，並透過 API Route 串接 OpenAI API。
 
 ❌ **待處理 (To-Do for Next Agent)**:
 1. **功能擴充**：
@@ -43,7 +29,8 @@
 > 
 > **你接下來的首要任務是：**
 > 1. 請建立一個 `/favorites` 的專屬頁面，顯示從 `localStorage` 讀取出來的收藏演算法清單。
-> 2. 開發完成後，請更新此 `DEVELOPMENT_RECORD.md` 的進度。
+> 2. 請在 `Sidebar` 左側導覽列加上 `/about` 與 `/favorites` 的導覽連結。
+> 3. 開發完成後，請更新此 `DEVELOPMENT_RECORD.md` 的進度。
 
 ---
 *最後更新時間：2026-06-08*

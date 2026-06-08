@@ -1,0 +1,93 @@
+import json
+import os
+from typing import List
+
+from dotenv import load_dotenv
+from fastapi import APIRouter
+from openai import AsyncOpenAI
+from pydantic import BaseModel, Field
+
+from algorithms import get_algorithm_by_slug
+
+load_dotenv()
+
+router = APIRouter()
+openai_api_key = os.environ.get("OPENAI_API_KEY")
+client = AsyncOpenAI(api_key=openai_api_key) if openai_api_key else None
+
+
+class Message(BaseModel):
+    role: str
+    content: str
+
+
+class ChatRequest(BaseModel):
+    user_id: str = "guest"
+    algorithm_slug: str = "general"
+    message: str
+    history: List[Message] = Field(default_factory=list)
+
+
+SYSTEM_PROMPT = """
+You are an encouraging machine-learning tutor for students.
+Answer in Traditional Chinese. Be concrete, concise, and beginner-friendly.
+Return JSON only:
+{
+  "reply": "response text",
+  "suggested_questions": ["question 1", "question 2", "question 3"],
+  "assistant_state": "speaking"
+}
+"""
+
+
+@router.post("/")
+async def chat_with_assistant(request: ChatRequest):
+    if client is None:
+        return {
+            "reply": "AI 助教尚未設定 OPENAI_API_KEY。你仍然可以瀏覽演算法卡片、收藏與進度。",
+            "suggested_questions": [
+                "這個演算法適合用在哪些情境？",
+                "它和其他演算法有什麼差異？",
+                "可以用簡單例子解釋嗎？",
+            ],
+            "assistant_state": "confused",
+        }
+
+    algo_context = ""
+    try:
+        if request.algorithm_slug and request.algorithm_slug != "general":
+            algo_data = get_algorithm_by_slug(request.algorithm_slug)
+            algo_context = (
+                "\n\nCurrent algorithm:\n"
+                f"Name: {algo_data.get('name_en', '')}\n"
+                f"Slug: {algo_data.get('slug', '')}\n"
+                f"Visual type: {algo_data.get('visual_type', '')}\n"
+            )
+    except Exception:
+        algo_context = ""
+
+    messages = [{"role": "system", "content": SYSTEM_PROMPT + algo_context}]
+    for msg in request.history[-5:]:
+        messages.append({"role": msg.role, "content": msg.content})
+    messages.append({"role": "user", "content": request.message})
+
+    try:
+        response = await client.chat.completions.create(
+            model=os.environ.get("MODEL_NAME", "gpt-4o-mini"),
+            messages=messages,
+            response_format={"type": "json_object"},
+            temperature=0.7,
+        )
+        result = json.loads(response.choices[0].message.content or "{}")
+        return {
+            "reply": result.get("reply", "我現在無法產生完整回覆，請再試一次。"),
+            "suggested_questions": result.get("suggested_questions", []),
+            "assistant_state": result.get("assistant_state", "speaking"),
+        }
+    except Exception as exc:
+        print(f"OpenAI API Error: {exc}")
+        return {
+            "reply": "AI 助教目前無法連線，請稍後再試。",
+            "suggested_questions": [],
+            "assistant_state": "confused",
+        }
