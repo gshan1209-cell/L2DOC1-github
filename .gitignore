@@ -17,3 +17,6 @@ env
 **/.streamlit/secrets.toml
 **/.env
 *.log
+.next/
+hw5/frontend/.next/
+hw5/frontend/node_modules

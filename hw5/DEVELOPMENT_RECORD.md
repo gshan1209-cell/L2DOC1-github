@@ -34,3 +34,46 @@
 
 ---
 *最後更新時間：2026-06-08*
+---
+
+## 2026-06-08 Refactor Update
+
+已將原本散落在 `hw5/` 根目錄的檔案重構為正式前後端專案：
+
+```text
+hw5/
+  backend/
+    main.py
+    algorithms.py
+    chat.py
+    data/algorithms.json
+    requirements.txt
+  frontend/
+    app/
+    components/
+    data/algorithms.json
+    lib/
+    package.json
+```
+
+目前可執行服務：
+
+- Backend: FastAPI, `http://127.0.0.1:8010`
+- Frontend: Next.js App Router, `http://localhost:3000`
+
+前端已完成：
+
+- 首頁演算法卡片
+- 搜尋、分類與難度篩選
+- 演算法詳細頁
+- 簡單 SVG 視覺化
+- 收藏頁
+- localStorage 學習進度
+- AI 助教面板與 `/api/chat` proxy
+
+驗證紀錄：
+
+- `npm install` 完成
+- `npm audit` 回報 0 vulnerabilities
+- `npm run build` 通過
+- FastAPI `/api/algorithms/` 回傳 10 筆資料

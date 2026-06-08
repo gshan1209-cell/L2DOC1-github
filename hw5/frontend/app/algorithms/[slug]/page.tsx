@@ -11,8 +11,9 @@ export function generateStaticParams() {
   return getAlgorithms().map((algorithm) => ({ slug: algorithm.slug }));
 }
 
-export default function AlgorithmDetailPage({ params }: { params: { slug: string } }) {
-  const algorithm = getAlgorithm(params.slug);
+export default async function AlgorithmDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const algorithm = getAlgorithm(slug);
   if (!algorithm) notFound();
 
   return (

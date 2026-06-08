@@ -1,51 +1,53 @@
-# ML Algorithm Tutor 機器學習互動學習平台
+# ML Algorithm Tutor
 
-這是一個適合新手小白學習機器學習的互動式網站。透過白話解釋、生活化比喻、圖解動畫以及虛擬 AI 助理，帶領使用者無痛理解機器學習前十大核心演算法。
+機器學習前十大演算法互動學習網站。專案已整理為正式的前後端結構：
 
-## 🚀 技術棧 (Tech Stack)
-- **框架 (Framework)**：Next.js (App Router)
-- **前端 (Frontend)**：React, TypeScript, Tailwind CSS, Framer Motion
-- **AI 助理 (AI Assistant)**：OpenAI API, Live2D / CSS 動畫 Fallback
-- **資料庫**：SQLite (使用者進度 / 收藏) / JSON (靜態內容)
-
-## ✨ 功能列表
-1. **十大演算法互動學習**：提供線性回歸、邏輯回歸、決策樹、隨機森林、SVM、KNN、K-means、樸素貝氏、PCA、梯度下降的白話教學與圖解。
-2. **AI 助理問答**：「小璃老師」提供白話解答與學習建議。
-3. **學習進度與小測驗**：每章節包含互動小測驗，並可記錄學習進度與收藏。
-4. **響應式設計**：支援桌機與手機瀏覽。
-
-## 📂 專案結構
 ```text
-.
-├── app/            # Next.js 頁面與 API 路由
-│   ├── api/        # 後端 API 邏輯
-│   └── (pages)/    # 頁面路由
-├── components/     # 共用 React 元件
-├── data/           # 靜態資料 (JSON)
-├── DEVELOPMENT_RECORD.md # 開發進度與交接紀錄
-└── README.md       # 專案說明
+hw5/
+  backend/   FastAPI API server
+  frontend/  Next.js App Router website
 ```
 
-## 啟動方式
+## 啟動後端
 
-### 前端啟動
-```bash
-cd D:\SeanLin\Python\hw5\frontend
-npm install
-npm run dev
-```
-預設運行於 `http://localhost:3000`
-
-### 後端啟動
-```bash
+```powershell
 cd D:\SeanLin\Python\hw5\backend
-pip install -r requirements.txt
-..\.venv\Scripts\python.exe -m uvicorn main:app --reload --port 8000
+..\..\.venv\Scripts\python.exe -m uvicorn main:app --reload --port 8010
 ```
-預設運行於 `http://localhost:8000`
 
-## 環境變數設定
-請在 backend 目錄下建立 `.env`：
-```env
-OPENAI_API_KEY=your_api_key_here
+後端 API：
+
+```text
+http://127.0.0.1:8010
+http://127.0.0.1:8010/docs
+```
+
+## 啟動前端
+
+```powershell
+cd D:\SeanLin\Python\hw5\frontend
+$env:NEXT_PUBLIC_BACKEND_URL="http://127.0.0.1:8010"
+npm run dev -- -p 3000
+```
+
+網站：
+
+```text
+http://localhost:3000
+```
+
+## 已完成功能
+
+- Next.js App Router 前端
+- FastAPI 後端
+- 演算法卡片、搜尋、分類與難度篩選
+- 演算法詳細頁與簡單視覺化
+- 收藏頁
+- localStorage 學習進度
+- AI 助教面板，透過後端 `/api/chat/` 串接 OpenAI API
+
+若要啟用 AI 助教，請在環境變數設定：
+
+```powershell
+$env:OPENAI_API_KEY="your_api_key_here"
 ```
