@@ -3,9 +3,9 @@ import type { DisplayAlgorithm } from "../lib/types";
 export default function AlgorithmVisualizer({ algorithm }: { algorithm: DisplayAlgorithm }) {
   const type = algorithm.visual_type ?? "";
   return (
-    <div className="visual" aria-label={`${algorithm.displayName} visualization`}>
-      <svg viewBox="0 0 420 240" role="img">
-        <rect x="0" y="0" width="420" height="240" fill="#f8fafc" />
+    <div className="relative w-full aspect-video bg-slate-50/50 rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex items-center justify-center p-4 my-6" aria-label={`${algorithm.displayName} visualization`}>
+      <svg className="w-full h-full max-h-[300px]" viewBox="0 0 420 240" role="img">
+        <rect x="0" y="0" width="420" height="240" fill="transparent" />
         {type.includes("tree") || type.includes("forest") ? (
           <>
             <circle cx="210" cy="45" r="18" fill="#2563eb" />

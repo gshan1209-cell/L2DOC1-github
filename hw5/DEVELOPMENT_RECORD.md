@@ -17,10 +17,12 @@
 4. **核心元件**：完成演算法卡片、左側導覽列、搜尋框、進度條、視覺圖解等元件。
 5. **互動功能**：完成小測驗 (`QuizBlock`)、收藏 (`FavoriteButton`)、學習進度標記功能，並與 `localStorage` 連動。
 6. **AI 助理**：完成 AI 助理聊天介面 (`ChatAssistant`)，並透過 API Route 串接 OpenAI API。
+7. **UI/UX 現代化優化**：全面導入 Tailwind CSS，優化首頁、演算法內容頁及各項元件（包含卡片懸浮、測驗回饋、AI 助教動畫等）。
+8. **AI 協作環境**：建立 `AGENT.md` 與 `GEMINI.md`，統整多模型協作規範與指令。
 
 ❌ **待處理 (To-Do for Next Agent)**:
 1. **功能擴充**：
-   - 建立一個 `/favorites` 的專屬頁面，讓使用者可以集中查看他們有標記愛心的演算法。
+   - 建立一個 `/favorites` 的專屬頁面，顯示從 `localStorage` 讀取出來的收藏演算法清單。
 
 ## 3. 給下一個 Agent 的指示 (Prompt for Next Agent)
 
@@ -29,8 +31,7 @@
 > 
 > **你接下來的首要任務是：**
 > 1. 請建立一個 `/favorites` 的專屬頁面，顯示從 `localStorage` 讀取出來的收藏演算法清單。
-> 2. 請在 `Sidebar` 左側導覽列加上 `/about` 與 `/favorites` 的導覽連結。
-> 3. 開發完成後，請更新此 `DEVELOPMENT_RECORD.md` 的進度。
+> 2. 開發完成後，請更新此 `DEVELOPMENT_RECORD.md` 的進度。
 
 ---
 *最後更新時間：2026-06-08*
