@@ -12,24 +12,28 @@ export default function ProgressBar({ total }: { total: number }) {
     }
     sync();
     window.addEventListener("storage", sync);
-    return () => window.removeEventListener("storage", sync);
+    window.addEventListener("progressUpdated", sync);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("progressUpdated", sync);
+    };
   }, []);
 
   const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
 
   return (
-    <div className="p-5 border-t border-slate-200/60 bg-slate-50/50 mt-auto backdrop-blur-md">
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider">整體學習進度</span>
-        <span className="text-sm font-black text-blue-600">{percent}%</span>
+    <div style={{ padding: '20px', borderTop: '1px solid var(--panel-border)', background: 'rgba(255, 255, 255, 0.02)', marginTop: 'auto', backdropFilter: 'blur(10px)', borderRadius: '0 0 var(--radius-lg) var(--radius-lg)' }}>
+      <div className="flex-between" style={{ marginBottom: '10px' }}>
+        <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>整體學習進度</span>
+        <span style={{ fontSize: '0.875rem', fontWeight: 800, color: 'var(--accent-cyan)' }}>{percent}%</span>
       </div>
-      <div className="w-full bg-slate-200/60 rounded-full h-2 overflow-hidden shadow-inner" aria-label="Learning progress">
-        <div className="bg-gradient-to-r from-blue-400 to-blue-600 h-full rounded-full transition-all duration-700 ease-out shadow-[0_0_10px_rgba(59,130,246,0.5)]" style={{ width: `${percent}%` }} />
+      <div style={{ width: '100%', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '999px', height: '6px', overflow: 'hidden' }} aria-label="Learning progress">
+        <div style={{ background: 'linear-gradient(90deg, var(--accent-cyan), var(--accent-blue))', height: '100%', borderRadius: '999px', transition: 'width 0.7s ease-out', boxShadow: '0 0 10px rgba(6, 182, 212, 0.5)', width: `${percent}%` }} />
       </div>
       {percent === 100 ? (
-        <p className="text-[10px] text-emerald-500 font-bold mt-2 text-center animate-pulse">🎉 恭喜完成所有演算法！</p>
+        <p style={{ fontSize: '0.65rem', color: 'var(--status-success)', fontWeight: 700, marginTop: '8px', textAlign: 'center' }}>🎉 恭喜完成所有演算法！</p>
       ) : (
-        <p className="text-[10px] text-slate-400 mt-2 text-right font-medium">{completed} / {total} 已完成</p>
+        <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: '8px', textAlign: 'right', fontWeight: 500 }}>{completed} / {total} 已完成</p>
       )}
     </div>
   );

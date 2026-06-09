@@ -5,47 +5,49 @@ import { getAlgorithms } from "../lib/algorithms";
 
 export default function HomePage() {
   const algorithms = getAlgorithms();
-  const categories = new Set(algorithms.map((item) => item.displayCategory));
 
   return (
-    <main className="flex-1 flex flex-col min-h-screen">
-      {/* ================= 頂部 Hero 區塊 ================= */}
-      <section className="relative bg-gradient-to-b from-blue-50/50 to-white pt-20 pb-16 px-6 lg:px-12 border-b border-slate-100 overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-400/10 blur-[100px] rounded-full pointer-events-none z-0" />
-
-        <div className="max-w-5xl mx-auto text-center relative z-10">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 tracking-tight mb-6 leading-tight">
-            輕鬆搞懂 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500">機器學習</span>
-            <br />不再被數學公式打敗
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
+      {/* Hero */}
+      <section className="glass-panel" style={{ padding: '80px 40px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: '-100px', left: '50%', transform: 'translateX(-50%)', width: '600px', height: '300px', background: 'rgba(6, 182, 212, 0.15)', filter: 'blur(100px)', zIndex: 0, pointerEvents: 'none' }}></div>
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{ display: 'inline-flex', padding: '6px 16px', borderRadius: '99px', background: 'rgba(6, 182, 212, 0.1)', border: '1px solid rgba(6, 182, 212, 0.2)', color: 'var(--accent-cyan)', fontSize: '0.85rem', fontWeight: 600, marginBottom: '24px' }}>
+            ✨ ML Tutor System v2.0
+          </div>
+          <h1 className="heading-1">
+            解鎖 <span className="text-gradient">機器學習</span> 的核心
           </h1>
-          <p className="text-lg md:text-xl text-slate-600 mb-10 max-w-2xl mx-auto font-medium leading-relaxed">
-            用卡片、視覺化、收藏、進度與 AI 助教，把十大機器學習演算法整理成可以反覆練習的學習介面。
+          <p className="subtitle" style={{ margin: '0 auto 32px' }}>
+            結合互動卡片、動態視覺化與 AI 助教，在深色科技介面中探索十大機器學習演算法，將艱澀理論轉化為直覺體驗。
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/about" className="px-8 py-4 bg-white text-slate-700 font-bold rounded-full hover:bg-slate-50 transition-all shadow-sm border border-slate-200 hover:border-slate-300">
-              了解平台特色
+          <div className="flex-center gap-4">
+            <Link href="#algorithms" className="btn btn-primary" style={{ padding: '14px 28px', fontSize: '1.1rem' }}>
+              啟動學習程序
+            </Link>
+            <Link href="/about" className="btn btn-secondary" style={{ padding: '14px 28px', fontSize: '1.1rem' }}>
+              查閱系統日誌
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ================= 演算法網格區塊 ================= */}
-      <section className="py-16 px-6 lg:px-12 bg-slate-50/50 flex-grow">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div>
-              <h2 className="text-3xl font-black text-slate-800 mb-2">探索十大演算法</h2>
-              <p className="text-slate-500 font-medium">挑選你想學習的主題，點擊卡片即可開始</p>
-            </div>
-
-            <div className="flex-grow max-w-sm w-full bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col justify-center">
-              <ProgressBar total={algorithms.length} />
-            </div>
+      {/* Grid */}
+      <section id="algorithms">
+        <div className="flex-between mb-8" style={{ alignItems: 'flex-end', flexWrap: 'wrap', gap: '24px' }}>
+          <div>
+            <h2 className="heading-2" style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: 0 }}>
+              <span style={{ width: '4px', height: '24px', background: 'var(--accent-cyan)', borderRadius: '4px', boxShadow: 'var(--shadow-glow)' }}></span>
+              探索演算法矩陣
+            </h2>
+            <p style={{ color: 'var(--text-muted)', marginLeft: '16px', marginTop: '8px' }}>選擇目標模組，載入學習資源</p>
           </div>
-
-          <AlgorithmGrid algorithms={algorithms} />
+          <div style={{ minWidth: '280px' }}>
+            <ProgressBar total={algorithms.length} />
+          </div>
         </div>
+        <AlgorithmGrid algorithms={algorithms} />
       </section>
-    </main>
+    </div>
   );
 }

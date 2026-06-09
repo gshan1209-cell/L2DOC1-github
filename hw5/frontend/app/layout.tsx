@@ -12,12 +12,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="zh-Hant">
-      <body>
+      <body suppressHydrationWarning>
         <div className="app-shell">
           <Sidebar />
-          <main className="content">{children}</main>
+          <main className="main-content">{children}</main>
         </div>
-        <ChatAssistant />
+        <div className="chat-assistant-wrapper">
+          <ChatAssistant />
+        </div>
       </body>
     </html>
   );

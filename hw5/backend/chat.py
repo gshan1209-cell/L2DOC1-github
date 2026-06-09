@@ -12,8 +12,11 @@ from algorithms import get_algorithm_by_slug
 load_dotenv()
 
 router = APIRouter()
-openai_api_key = os.environ.get("OPENAI_API_KEY")
-client = AsyncOpenAI(api_key=openai_api_key) if openai_api_key else None
+gemini_api_key = os.environ.get("GEMINI_API_KEY")
+client = AsyncOpenAI(
+    api_key=gemini_api_key,
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+) if gemini_api_key else None
 
 
 class Message(BaseModel):
@@ -44,7 +47,7 @@ Return JSON only:
 async def chat_with_assistant(request: ChatRequest):
     if client is None:
         return {
-            "reply": "AI 助教尚未設定 OPENAI_API_KEY。你仍然可以瀏覽演算法卡片、收藏與進度。",
+            "reply": "AI 助教尚未設定 GEMINI_API_KEY。你仍然可以瀏覽演算法卡片、收藏與進度。",
             "suggested_questions": [
                 "這個演算法適合用在哪些情境？",
                 "它和其他演算法有什麼差異？",
@@ -73,7 +76,7 @@ async def chat_with_assistant(request: ChatRequest):
 
     try:
         response = await client.chat.completions.create(
-            model=os.environ.get("MODEL_NAME", "gpt-4o-mini"),
+            model=os.environ.get("GEMINI_MODEL", "gemini-2.5-flash"),
             messages=messages,
             response_format={"type": "json_object"},
             temperature=0.7,
@@ -85,7 +88,7 @@ async def chat_with_assistant(request: ChatRequest):
             "assistant_state": result.get("assistant_state", "speaking"),
         }
     except Exception as exc:
-        print(f"OpenAI API Error: {exc}")
+        print(f"Gemini API Error: {exc}")
         return {
             "reply": "AI 助教目前無法連線，請稍後再試。",
             "suggested_questions": [],

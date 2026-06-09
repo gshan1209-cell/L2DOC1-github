@@ -21,13 +21,13 @@ cd D:\SeanLin\Python\hw5\backend
 http://127.0.0.1:8010
 http://127.0.0.1:8010/docs
 ```
-
+n
 ## 啟動前端
 
 ```powershell
 cd D:\SeanLin\Python\hw5\frontend
 $env:NEXT_PUBLIC_BACKEND_URL="http://127.0.0.1:8010"
-npm run dev -- -p 3000
+npm run dev -- -p 4000
 ```
 
 網站：

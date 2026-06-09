@@ -1,63 +1,235 @@
-import Link from 'next/link';
+"use client";
 
-export const metadata = {
-    title: '關於本站 | ML Algorithm Tutor',
-    description: '了解這個專為新手設計的機器學習互動學習平台。',
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { BrainCircuit, CheckCircle, XCircle, ArrowRight, RefreshCw } from "lucide-react";
+
+type QuizQuestion = {
+    algoSlug: string;
+    algoName: string;
+    question: string;
+    options: string[];
+    answer: string;
+    explanation: string;
 };
 
-export default function AboutPage() {
+export default function QuizPage() {
+    const [questions, setQuestions] = useState<QuizQuestion[]>([]);
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const [selectedOption, setSelectedOption] = useState<string | null>(null);
+    const [isAnswered, setIsAnswered] = useState(false);
+    const [score, setScore] = useState(0);
+    const [quizFinished, setQuizFinished] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchQuestions = async () => {
+            try {
+                const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8010";
+                const res = await fetch(`${baseUrl}/api/algorithms/`);
+                if (res.ok) {
+                    const data = await res.json();
+                    const allQuestions: QuizQuestion[] = [];
+                    data.forEach((algo: any) => {
+                        if (algo.quiz && Array.isArray(algo.quiz)) {
+                            algo.quiz.forEach((q: any) => {
+                                allQuestions.push({
+                                    algoSlug: algo.slug,
+                                    algoName: algo.name_zh,
+                                    question: q.question,
+                                    options: q.options,
+                                    answer: q.answer,
+                                    explanation: q.explanation,
+                                });
+                            });
+                        }
+                    });
+                    // 隨機打亂所有題目
+                    const shuffled = allQuestions.sort(() => 0.5 - Math.random());
+                    // 取前 10 題作為綜合測驗
+                    setQuestions(shuffled.slice(0, 10));
+                }
+            } catch (error) {
+                console.error("無法取得測驗資料:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchQuestions();
+    }, []);
+
+    const handleOptionClick = (option: string) => {
+        if (isAnswered) return;
+        setSelectedOption(option);
+        setIsAnswered(true);
+
+        if (option === questions[currentQuestionIndex].answer) {
+            setScore((prev) => prev + 1);
+        }
+    };
+
+    const handleNextQuestion = () => {
+        if (currentQuestionIndex < questions.length - 1) {
+            setCurrentQuestionIndex((prev) => prev + 1);
+            setSelectedOption(null);
+            setIsAnswered(false);
+        } else {
+            setQuizFinished(true);
+        }
+    };
+
+    const handleRestart = () => {
+        const shuffled = [...questions].sort(() => 0.5 - Math.random());
+        setQuestions(shuffled);
+        setCurrentQuestionIndex(0);
+        setSelectedOption(null);
+        setIsAnswered(false);
+        setScore(0);
+        setQuizFinished(false);
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-purple-500"></div>
+            </div>
+        );
+    }
+
+    if (questions.length === 0) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                    <p className="text-xl text-gray-600 mb-4">目前沒有可用的測驗題</p>
+                    <Link href="/algorithms" className="text-purple-600 font-medium hover:underline">
+                        回到演算法列表
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+
+    const currentQ = questions[currentQuestionIndex];
+
     return (
-        <main className="p-8 lg:p-12 max-w-4xl mx-auto w-full">
-            <header className="mb-12 text-center mt-8">
-                <span className="px-4 py-1 text-xs font-bold rounded-full bg-blue-100 text-blue-700 mb-4 inline-block">About Us</span>
-                <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">關於 ML Tutor</h1>
-                <p className="text-lg text-slate-600 max-w-2xl mx-auto">專為完全零基礎新手打造的機器學習互動樂園</p>
-            </header>
+        <div className="min-h-screen bg-gray-50 py-12">
+            <div className="container mx-auto px-4 max-w-3xl">
+                <div className="flex items-center gap-3 mb-8">
+                    <BrainCircuit className="w-8 h-8 text-purple-500" />
+                    <h1 className="text-3xl font-bold text-gray-800">綜合測驗</h1>
+                </div>
 
-            <div className="space-y-10">
-                {/* 我們的使命 */}
-                <section className="bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-slate-200">
-                    <h2 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3">
-                        <span className="text-3xl">🎯</span> 我們的使命
-                    </h2>
-                    <p className="text-slate-600 leading-relaxed text-lg">
-                        機器學習聽起來總是很遙遠、充滿了看不懂的複雜微積分與程式碼嗎？<br /><br />
-                        其實，演算法的本質就是<strong className="text-blue-600">「解決問題的邏輯」</strong>。我們希望透過生活化的比喻、直覺的視覺動畫，以及互動式的問答，幫助非本科系學生、產品經理、行銷人員或是任何對 AI 有興趣的人，無痛建立機器學習的核心觀念。
-                    </p>
-                </section>
+                {!quizFinished ? (
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden transition-all">
+                        <div className="p-6 md:p-8">
+                            <div className="flex justify-between items-center mb-6">
+                                <span className="text-sm font-medium text-gray-500">
+                                    第 {currentQuestionIndex + 1} / {questions.length} 題
+                                </span>
+                                <span className="px-3 py-1 bg-purple-50 text-purple-600 text-xs font-semibold rounded-full border border-purple-100">
+                                    {currentQ.algoName}
+                                </span>
+                            </div>
 
-                {/* 平台特色 */}
-                <section className="bg-blue-50/50 p-8 md:p-10 rounded-3xl border border-blue-100">
-                    <h2 className="text-2xl font-bold text-blue-900 mb-8 flex items-center gap-3">
-                        <span className="text-3xl">✨</span> 平台特色
-                    </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:border-blue-200 transition-colors">
-                            <div className="text-3xl mb-4">🧩</div>
-                            <h3 className="font-bold text-slate-800 text-lg mb-2">十大核心演算法</h3>
-                            <p className="text-sm text-slate-500 leading-relaxed">從基礎的線性回歸到進階的 SVM 與隨機森林，圖解每個演算法的運作原理與應用場景。</p>
+                            <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-8 leading-relaxed">
+                                {currentQ.question}
+                            </h2>
+
+                            <div className="space-y-3">
+                                {currentQ.options.map((option, idx) => {
+                                    let buttonClass = "w-full text-left px-6 py-4 rounded-xl border-2 transition-all duration-200 font-medium ";
+
+                                    if (!isAnswered) {
+                                        buttonClass += "border-gray-200 hover:border-purple-300 hover:bg-purple-50 text-gray-700";
+                                    } else {
+                                        if (option === currentQ.answer) {
+                                            buttonClass += "border-green-500 bg-green-50 text-green-700";
+                                        } else if (option === selectedOption) {
+                                            buttonClass += "border-red-500 bg-red-50 text-red-700";
+                                        } else {
+                                            buttonClass += "border-gray-200 text-gray-400 opacity-50";
+                                        }
+                                    }
+
+                                    return (
+                                        <button
+                                            key={idx}
+                                            onClick={() => handleOptionClick(option)}
+                                            disabled={isAnswered}
+                                            className={buttonClass}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <span>{option}</span>
+                                                {isAnswered && option === currentQ.answer && <CheckCircle className="w-5 h-5 text-green-500" />}
+                                                {isAnswered && option === selectedOption && option !== currentQ.answer && <XCircle className="w-5 h-5 text-red-500" />}
+                                            </div>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            {isAnswered && (
+                                <div className="mt-8 p-5 bg-blue-50 rounded-xl border border-blue-100 animate-in fade-in slide-in-from-bottom-2">
+                                    <h3 className="font-bold text-blue-800 mb-2">解析：</h3>
+                                    <p className="text-blue-700">{currentQ.explanation}</p>
+                                </div>
+                            )}
                         </div>
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:border-blue-200 transition-colors">
-                            <div className="text-3xl mb-4">🤖</div>
-                            <h3 className="font-bold text-slate-800 text-lg mb-2">AI 虛擬助教陪伴</h3>
-                            <p className="text-sm text-slate-500 leading-relaxed">遇到不懂的地方？隨時召喚「小璃老師」，讓 AI 助教用最白話的方式為你解惑。</p>
-                        </div>
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:border-blue-200 transition-colors">
-                            <div className="text-3xl mb-4">🎮</div>
-                            <h3 className="font-bold text-slate-800 text-lg mb-2">互動測驗與進度</h3>
-                            <p className="text-sm text-slate-500 leading-relaxed">每個章節都配有觀念小測驗，並自動記錄你的學習進度，看著進度條填滿超有成就感！</p>
+
+                        <div className="bg-gray-50 px-6 py-4 border-t border-gray-100 flex justify-end">
+                            <button
+                                onClick={handleNextQuestion}
+                                disabled={!isAnswered}
+                                className={`flex items-center gap-2 px-6 py-2.5 rounded-full font-medium transition-colors ${isAnswered
+                                        ? "bg-purple-600 hover:bg-purple-700 text-white shadow-sm"
+                                        : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                    }`}
+                            >
+                                {currentQuestionIndex < questions.length - 1 ? "下一題" : "查看成績"}
+                                <ArrowRight className="w-4 h-4" />
+                            </button>
                         </div>
                     </div>
-                </section>
+                ) : (
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 md:p-12 text-center animate-in zoom-in-95 duration-300">
+                        <div className="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <BrainCircuit className="w-12 h-12 text-purple-600" />
+                        </div>
+                        <h2 className="text-3xl font-bold text-gray-800 mb-2">測驗完成！</h2>
+                        <p className="text-gray-500 mb-8">來看看你對機器學習演算法的掌握程度吧</p>
 
-                {/* CTA */}
-                <section className="text-center pt-10 pb-16">
-                    <h2 className="text-xl font-bold text-slate-800 mb-8">準備好開始你的 AI 學習之旅了嗎？</h2>
-                    <Link href="/" className="inline-flex items-center justify-center px-8 py-4 bg-blue-600 text-white font-bold rounded-full hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 hover:shadow-xl hover:-translate-y-1 duration-200">
-                        🚀 開始探索演算法
-                    </Link>
-                </section>
+                        <div className="flex justify-center gap-8 mb-10">
+                            <div className="text-center">
+                                <div className="text-4xl font-black text-purple-600 mb-1">{score}</div>
+                                <div className="text-sm text-gray-500 font-medium">答對題數</div>
+                            </div>
+                            <div className="w-px bg-gray-200"></div>
+                            <div className="text-center">
+                                <div className="text-4xl font-black text-gray-800 mb-1">{questions.length}</div>
+                                <div className="text-sm text-gray-500 font-medium">總題數</div>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row justify-center gap-4">
+                            <button
+                                onClick={handleRestart}
+                                className="flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-full font-medium transition-colors shadow-sm"
+                            >
+                                <RefreshCw className="w-5 h-5" />
+                                重新測驗
+                            </button>
+                            <Link
+                                href="/algorithms"
+                                className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full font-medium transition-colors"
+                            >
+                                繼續學習
+                                <ArrowRight className="w-5 h-5" />
+                            </Link>
+                        </div>
+                    </div>
+                )}
             </div>
-        </main>
+        </div>
     );
 }

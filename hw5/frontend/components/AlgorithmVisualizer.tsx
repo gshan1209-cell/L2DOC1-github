@@ -3,8 +3,8 @@ import type { DisplayAlgorithm } from "../lib/types";
 export default function AlgorithmVisualizer({ algorithm }: { algorithm: DisplayAlgorithm }) {
   const type = algorithm.visual_type ?? "";
   return (
-    <div className="relative w-full aspect-video bg-slate-50/50 rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex items-center justify-center p-4 my-6" aria-label={`${algorithm.displayName} visualization`}>
-      <svg className="w-full h-full max-h-[300px]" viewBox="0 0 420 240" role="img">
+    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }} aria-label={`${algorithm.displayName} visualization`}>
+      <svg style={{ width: '100%', height: '100%', maxHeight: '280px' }} viewBox="0 0 420 240" role="img">
         <rect x="0" y="0" width="420" height="240" fill="transparent" />
         {type.includes("tree") || type.includes("forest") ? (
           <>
