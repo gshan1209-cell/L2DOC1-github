@@ -9,6 +9,12 @@ from pydantic import BaseModel, Field
 
 from algorithms import get_algorithm_by_slug
 
+# 優先載入專案根目錄的 .env 檔案以取得 GEMINI_API_KEY
+root_env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), '.env')
+if os.path.exists(root_env_path):
+    load_dotenv(root_env_path)
+
+# 接著載入當下目錄或預設的 .env
 load_dotenv()
 
 router = APIRouter()

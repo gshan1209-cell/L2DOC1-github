@@ -499,3 +499,50 @@ a {
   bottom: 24px;
   z-index: 50;
 }
+
+/* Theme Colors */
+body.theme-light {
+  --bg-color: #f8fafc;
+  --panel-bg: rgba(255, 255, 255, 0.8);
+  --panel-border: rgba(0, 0, 0, 0.1);
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --accent-cyan: #0891b2;
+  --accent-blue: #2563eb;
+}
+
+body.theme-light .heading-1, 
+body.theme-light .heading-2, 
+body.theme-light .heading-3,
+body.theme-light .card-title,
+body.theme-light .brand-text h1 {
+  color: #0f172a;
+}
+
+body.theme-light .heading-1 {
+  background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+body.theme-light .sidebar {
+  background: rgba(248, 250, 252, 0.8);
+  border-right: 1px solid rgba(0,0,0,0.1);
+}
+
+body.theme-blue {
+  --bg-color: #0f172a;
+  --panel-bg: rgba(30, 58, 138, 0.4);
+  --panel-border: rgba(96, 165, 250, 0.2);
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --accent-cyan: #38bdf8;
+  --accent-blue: #60a5fa;
+}
+
+body.theme-blue .sidebar {
+  background: rgba(15, 23, 42, 0.9);
+}
+
