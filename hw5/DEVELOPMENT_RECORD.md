@@ -23,6 +23,7 @@
 10. **學習進度**：建立 `/progress` 頁面，讀取 `localStorage` 狀態並視覺化呈現學習進度與剩餘演算法。
 11. **綜合測驗**：建立 `/quiz` 頁面，從資料庫中隨機抽取測驗題，並提供即時的答題回饋與最終成績結算。
 12. **UI/UX 全站優化**：針對全站卡片、按鈕增加微互動動畫 (縮放、發光)、強化 Glassmorphism 毛玻璃特效與過渡動畫。
+13. **官方 Gemini SDK 整合**：更新專案與後端 `requirements.txt` 引入 `google-genai` 依賴，並將 `backend/chat.py` 重構為官方 Google GenAI SDK 的 `client.aio` (非同步) 呼叫方式，使用 `types.GenerateContentConfig` 傳入 `system_instruction` 與 `response_mime_type="application/json"`，完美適配 Gemini-2.5-flash 等最新模型。
 
 ❌ **待處理 (To-Do for Next Agent)**:
 1. **持續優化與擴充**：
@@ -35,11 +36,12 @@
 > 請根據本專案的 `Gemini_機器學習前十大演算法互動學習網站_開發規格書.md` 以及此 `DEVELOPMENT_RECORD.md` 繼續開發。
 > 
 > **你接下來的首要任務是：**
-> 1. 確認系統目前功能是否已滿足所有需求，並協助使用者進行進一步的客製化或除錯。
-> 2. 開發完成後，請更新此 `DEVELOPMENT_RECORD.md` 的進度。
+> 1. 協助使用者配置 `.env` 檔案以輸入實際的 `GEMINI_API_KEY`，進行線上聊天對話測試。
+> 2. 確認系統目前功能是否已滿足所有需求，並協助使用者進行進一步的客製化或除錯。
+> 3. 開發完成後，請更新此 `DEVELOPMENT_RECORD.md` 的進度。
 
 ---
-*最後更新時間：2026-06-09 (UI 優化與測驗系統上線)*
+*最後更新時間：2026-06-09 (依賴更新與官方 Gemini SDK 整合上線)*
 ---
 
 ## 2026-06-08 Refactor Update

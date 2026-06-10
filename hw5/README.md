@@ -1,6 +1,9 @@
 # ML Algorithm Tutor 機器學習前十大演算法互動學習網站
 ![alt text](demo.png)
 ## 1. 專案介紹
+GitHub 位置: https://github.com/gshan1209-cell/machinelearningHw05
+上架網址: https://machinelearning-hw05.vercel.app/
+
 這是一個適合新手小白學習機器學習的互動式網站。專案將原本靜態的「機器學習前十大演算法」轉換成一個可互動、可學習、可問答的動態網頁。透過白話解釋、生活化比喻、圖解動畫及 AI 虛擬助教，幫助沒有資訊背景的人也能輕鬆理解機器學習的核心概念。
 
 ## 2. 技術棧

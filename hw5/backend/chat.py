@@ -4,7 +4,8 @@ from typing import List
 
 from dotenv import load_dotenv
 from fastapi import APIRouter
-from openai import AsyncOpenAI
+from google import genai
+from google.genai import types
 from pydantic import BaseModel, Field
 
 from algorithms import get_algorithm_by_slug
@@ -19,10 +20,7 @@ load_dotenv()
 
 router = APIRouter()
 gemini_api_key = os.environ.get("GEMINI_API_KEY")
-client = AsyncOpenAI(
-    api_key=gemini_api_key,
-    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
-) if gemini_api_key else None
+client = genai.Client(api_key=gemini_api_key) if gemini_api_key else None
 
 
 class Message(BaseModel):
@@ -75,19 +73,33 @@ async def chat_with_assistant(request: ChatRequest):
     except Exception:
         algo_context = ""
 
-    messages = [{"role": "system", "content": SYSTEM_PROMPT + algo_context}]
+    contents = []
     for msg in request.history[-5:]:
-        messages.append({"role": msg.role, "content": msg.content})
-    messages.append({"role": "user", "content": request.message})
+        role = "model" if msg.role == "assistant" else "user"
+        contents.append(
+            types.Content(
+                role=role,
+                parts=[types.Part.from_text(text=msg.content)]
+            )
+        )
+    contents.append(
+        types.Content(
+            role="user",
+            parts=[types.Part.from_text(text=request.message)]
+        )
+    )
 
     try:
-        response = await client.chat.completions.create(
+        response = await client.aio.models.generate_content(
             model=os.environ.get("GEMINI_MODEL", "gemini-2.5-flash"),
-            messages=messages,
-            response_format={"type": "json_object"},
-            temperature=0.7,
+            contents=contents,
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM_PROMPT + algo_context,
+                temperature=0.7,
+                response_mime_type="application/json",
+            )
         )
-        result = json.loads(response.choices[0].message.content or "{}")
+        result = json.loads(response.text or "{}")
         return {
             "reply": result.get("reply", "我現在無法產生完整回覆，請再試一次。"),
             "suggested_questions": result.get("suggested_questions", []),
