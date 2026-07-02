@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}我的 Django 網站{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        /* 確保頁面高度至少撐滿視窗，讓 footer 能維持在底部（可選） */
+        .main-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .content-block {
+            flex: 1; /* 讓內容區塊自動填滿剩餘空間 */
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <div class="container main-container">
+        
+        <header class="banner-block py-3 my-2 bg-light rounded text-center">
+            {% block banner %}
+            <h1>歡迎來到我的網站</h1>
+            <p class="lead">這是一個使用 Django + Bootstrap 5 的主模板</p>
+            {% endblock %}
+        </header>
+
+        <main class="content-block py-4">
+            {% block content %}
+            <p>這裡主內容區塊。</p>
+            {% endblock %}
+        </main>
+
+        <footer class="footer-block py-3 my-4 border-top text-center text-muted">
+            {% block footer %}
+            <p>&copy; 2026 My Django Website. All rights reserved.</p>
+            {% endblock %}
+        </footer>
+
+    </div>
+
+    <div class="modal fade" id="djangoAutoModal" tabindex="-1" aria-labelledby="autoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="autoModalLabel">
+                        {% if modalTitle %}{{ modalTitle }}{% else %}提示訊息{% endif %}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {{ modalMessage }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 透過 Django 樣版語法檢查是否有傳入 modalMessage 
+            // 使用 |escapejs 濾鏡可以防止 XSS 攻擊與 JavaScript 語法解析錯誤
+            const modalMessage = "{{ modalMessage|escapejs }}";
+
+            if (modalMessage && modalMessage.trim() !== "") {
+                // 初始化並顯示 Bootstrap Modal
+                const myModalEl = document.getElementById('djangoAutoModal');
+                const modal = new bootstrap.Modal(myModalEl);
+                modal.show();
+            }
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
